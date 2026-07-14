@@ -28,7 +28,7 @@ exports.uploadProduct = async (req, res) => {
         confidence        = aiData.confidence    ?? null;
       }
     } catch (aiErr) {
-      console.warn('AI service unavailable, storing without prediction:', aiErr.message);
+      // AI service unavailable — continue without prediction
     }
 
     // Emit real-time notification to admin room

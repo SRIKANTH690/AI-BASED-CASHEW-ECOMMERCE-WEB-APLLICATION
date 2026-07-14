@@ -24,9 +24,7 @@ app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // ── Socket.io — real-time admin notifications ─────────────
 io.on('connection', (socket) => {
-  console.log('Socket connected:', socket.id);
   socket.on('join_admin', () => socket.join('admin_room'));
-  socket.on('disconnect', () => console.log('Socket disconnected:', socket.id));
 });
 // Attach io to app so controllers can emit events
 app.set('io', io);
