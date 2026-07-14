@@ -1041,8 +1041,13 @@ body.hide-buy .btn-buy,body.hide-buy .btn-contact,body.hide-buy #cartBubble,body
       <button class="modal-close" onclick="closeModal('adminLoginModal')">✕</button>
     </div>
     <div class="modal-body">
+      <div style="background:var(--warm);padding:1rem;border-radius:var(--r-sm);margin-bottom:1.5rem;font-size:.82rem;color:var(--muted);">
+        <strong style="color:var(--brown-dk)">Demo Credentials:</strong><br>
+        Email: <code>admin@panruti.com</code><br>
+        Password: <code>admin123</code>
+      </div>
       <form onsubmit="handleAdminLogin(event)">
-        <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="Enter admin email" required/></div>
+        <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@panruti.com" required/></div>
         <div class="form-group"><label>Password</label><input type="password" id="adminPassword" placeholder="••••••••" required/></div>
         <button type="submit" class="btn-submit">Login as Admin</button>
       </form>
@@ -1078,6 +1083,7 @@ body.hide-buy .btn-buy,body.hide-buy .btn-contact,body.hide-buy #cartBubble,body
           <div style="font-size:.68rem;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:.8rem;">Quick Info</div>
           <div style="font-size:.78rem;color:rgba(255,255,255,.45);line-height:1.7;">
             <div>📍 Panruti, Tamil Nadu</div>
+            <div>✉️ admin@panruti.com</div>
           </div>
         </div>
       </div>
@@ -2308,7 +2314,7 @@ function renderAdminContent(section){
         </div>
         <div style="overflow-x:auto;border-radius:var(--r-sm);border:1px solid var(--border);">
           <table class="admin-products-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Village</th><th>District</th><th>State</th><th>PIN</th><th>Farm Size</th><th>Crop Type</th><th>Experience</th><th>Joined</th></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Village</th><th>District</th><th>State</th><th>PIN</th><th>Farm Size</th><th>Crop Type</th><th>Experience</th><th>Address</th><th>Joined</th></tr></thead>
             <tbody>
               ${farmers.length?farmers.map(f=>`
                 <tr>
@@ -2322,8 +2328,9 @@ function renderAdminContent(section){
                   <td>${f.farm_size?f.farm_size+' acres':'—'}</td>
                   <td>${f.crop_type||'—'}</td>
                   <td>${f.experience_years?f.experience_years+' yrs':'—'}</td>
+                  <td style="font-size:.78rem;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.full_address||'—'}</td>
                   <td style="color:var(--muted);font-size:.8rem;">${new Date(f.created_at).toLocaleDateString('en-IN')}</td>
-                </tr>`).join('') : '<tr><td colspan="11" style="text-align:center;padding:2rem;color:var(--muted)">No farmers registered yet.</td></tr>'}
+                </tr>`).join('') : '<tr><td colspan="12" style="text-align:center;padding:2rem;color:var(--muted)">No farmers registered yet.</td></tr>'}
             </tbody>
           </table>
         </div>`;
@@ -2339,10 +2346,11 @@ function renderAdminContent(section){
         </div>
         <div style="overflow-x:auto;border-radius:var(--r-sm);border:1px solid var(--border);">
           <table class="admin-products-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>District</th><th>State</th><th>PIN</th><th>Joined</th></tr></thead>
+            <thead><tr><th>Customer Name</th><th>Login Name</th><th>Email</th><th>Phone</th><th>City</th><th>District</th><th>State</th><th>PIN</th><th>Address</th><th>Joined</th></tr></thead>
             <tbody>
               ${customers.length?customers.map(c=>`
                 <tr>
+                  <td style="font-weight:700;color:var(--forest-mid)">${c.customer_name||c.name||'—'}</td>
                   <td style="font-weight:600">${c.name}</td>
                   <td style="color:var(--muted);font-size:.82rem;">${c.email}</td>
                   <td>${c.phone||'—'}</td>
@@ -2350,8 +2358,9 @@ function renderAdminContent(section){
                   <td>${c.district||'—'}</td>
                   <td>${c.state||'—'}</td>
                   <td>${c.pincode||'—'}</td>
+                  <td style="font-size:.78rem;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.full_address||c.address||'—'}</td>
                   <td style="color:var(--muted);font-size:.8rem;">${new Date(c.created_at).toLocaleDateString('en-IN')}</td>
-                </tr>`).join('') : '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">No customers registered yet.</td></tr>'}
+                </tr>`).join('') : '<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--muted)">No customers registered yet.</td></tr>'}
             </tbody>
           </table>
         </div>`;

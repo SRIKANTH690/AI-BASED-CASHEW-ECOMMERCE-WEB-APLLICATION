@@ -4,15 +4,24 @@ const Joi     = require('joi');
 const UserModel = require('../models/userModel');
 
 const registerSchema = Joi.object({
-  name:       Joi.string().min(2).max(100).required(),
-  email:      Joi.string().email().required(),
-  password:   Joi.string().min(6).required(),
-  role:       Joi.string().valid('farmer','customer').required(),
-  phone:      Joi.string().min(10).max(15).required(),
-  village:    Joi.string().optional().allow(''),
-  district:   Joi.string().optional().allow(''),
-  farm_size:  Joi.number().optional(),
-  city:       Joi.string().optional().allow(''),
+  name:             Joi.string().min(2).max(100).required(),
+  email:            Joi.string().email().required(),
+  password:         Joi.string().min(6).required(),
+  role:             Joi.string().valid('farmer','customer').required(),
+  phone:            Joi.string().min(10).max(15).required(),
+  // Farmer fields
+  village:          Joi.string().optional().allow(''),
+  district:         Joi.string().optional().allow(''),
+  farm_size:        Joi.number().optional().allow(null,''),
+  state:            Joi.string().optional().allow(''),
+  pincode:          Joi.string().optional().allow(''),
+  experience_years: Joi.number().optional().allow(null,''),
+  crop_type:        Joi.string().optional().allow(''),
+  full_address:     Joi.string().optional().allow(''),
+  // Customer fields
+  city:             Joi.string().optional().allow(''),
+  address:          Joi.string().optional().allow(''),
+  district_cust:    Joi.string().optional().allow(''),
 });
 
 function signToken(user) {
@@ -42,14 +51,25 @@ exports.register = async (req, res) => {
 
     if (value.role === 'farmer') {
       await UserModel.createFarmerProfile(user.id, {
-        village: value.village || '',
-        district: value.district || '',
-        farm_size: value.farm_size || null
+        village:          value.village          || '',
+        district:         value.district         || '',
+        farm_size:        value.farm_size         || null,
+        phone:            value.phone             || null,
+        state:            value.state             || null,
+        pincode:          value.pincode           || null,
+        experience_years: value.experience_years  || null,
+        crop_type:        value.crop_type         || null,
+        full_address:     value.full_address      || null
       });
     } else if (value.role === 'customer') {
       await UserModel.createCustomerProfile(user.id, {
-        city: value.city || '',
-        address: ''
+        city:          value.city        || '',
+        address:       value.address     || '',
+        phone:         value.phone       || null,
+        state:         value.state       || null,
+        district:      value.district_cust || value.district || null,
+        pincode:       value.pincode     || null,
+        customer_name: value.name        || null
       });
     }
 

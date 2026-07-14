@@ -27,28 +27,31 @@ const UserModel = {
     );
   },
 
-  async createCustomerProfile(userId, { city, address, phone, state, district, pincode }) {
+  async createCustomerProfile(userId, { city, address, phone, state, district, pincode, customer_name }) {
     await pool.query(
-      `INSERT INTO customers (user_id, city, address, phone, state, district, pincode, full_address)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
-      [userId, city, address||null, phone||null, state||null, district||null, pincode||null, address||null]
+      `INSERT INTO customers (user_id, city, address, phone, state, district, pincode, full_address, customer_name)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+      [userId, city, address||null, phone||null, state||null, district||null, pincode||null, address||null, customer_name||null]
     );
   },
 
   async getAllFarmers() {
     const { rows } = await pool.query(
-      `SELECT u.id,u.name,u.email,u.phone,u.created_at,
-              f.village,f.district,f.farm_size,f.state,f.pincode,f.experience_years,f.crop_type,f.full_address
-       FROM users u LEFT JOIN farmers f ON u.id=f.user_id WHERE u.role='farmer' ORDER BY u.created_at DESC`
+      `SELECT u.id, u.name, u.email, u.phone, u.created_at,
+              f.village, f.district, f.farm_size, f.state, f.pincode,
+              f.experience_years, f.crop_type, f.full_address
+       FROM users u LEFT JOIN farmers f ON u.id=f.user_id
+       WHERE u.role='farmer' ORDER BY u.created_at DESC`
     );
     return rows;
   },
 
   async getAllCustomers() {
     const { rows } = await pool.query(
-      `SELECT u.id,u.name,u.email,u.phone,u.created_at,
-              c.city,c.state,c.district,c.pincode,c.full_address
-       FROM users u LEFT JOIN customers c ON u.id=c.user_id WHERE u.role='customer' ORDER BY u.created_at DESC`
+      `SELECT u.id, u.name, u.email, u.phone, u.created_at,
+              c.customer_name, c.city, c.state, c.district, c.pincode, c.address, c.full_address
+       FROM users u LEFT JOIN customers c ON u.id=c.user_id
+       WHERE u.role='customer' ORDER BY u.created_at DESC`
     );
     return rows;
   }

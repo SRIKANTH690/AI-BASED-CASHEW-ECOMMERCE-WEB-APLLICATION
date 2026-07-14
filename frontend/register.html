@@ -30,15 +30,31 @@
         </div>
         <div class="form-row">
           <div class="form-group"><label>District</label><input type="text" id="district" placeholder="Cuddalore"/></div>
+          <div class="form-group"><label>State</label><input type="text" id="farmerState" placeholder="Tamil Nadu"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>PIN Code</label><input type="text" id="farmerPincode" placeholder="607103" maxlength="6"/></div>
           <div class="form-group"><label>Farm Size (acres)</label><input type="number" id="farmSize" placeholder="5" min="0"/></div>
         </div>
+        <div class="form-row">
+          <div class="form-group"><label>Crop Type</label><input type="text" id="cropType" placeholder="Cashew"/></div>
+          <div class="form-group"><label>Experience (years)</label><input type="number" id="expYears" placeholder="5" min="0"/></div>
+        </div>
+        <div class="form-group"><label>Full Address</label><textarea id="farmerAddress" rows="2" placeholder="Door no, Street, Area" style="padding:.65rem 1rem;border:1.5px solid #ddd0bb;border-radius:8px;font-size:.88rem;background:#fdf8f0;outline:none;width:100%;resize:vertical;font-family:inherit;"></textarea></div>
       </div>
+
       <!-- Customer fields -->
       <div id="customerFields" style="display:none;">
         <div class="form-row">
           <div class="form-group"><label>Full Name *</label><input type="text" id="custName" placeholder="Raj Kumar"/></div>
           <div class="form-group"><label>City</label><input type="text" id="custCity" placeholder="Chennai"/></div>
         </div>
+        <div class="form-row">
+          <div class="form-group"><label>District</label><input type="text" id="custDistrict" placeholder="Chennai"/></div>
+          <div class="form-group"><label>State</label><input type="text" id="custState" placeholder="Tamil Nadu"/></div>
+        </div>
+        <div class="form-group"><label>PIN Code</label><input type="text" id="custPincode" placeholder="600001" maxlength="6" style="max-width:180px;"/></div>
+        <div class="form-group"><label>Address</label><textarea id="custAddress" rows="2" placeholder="Door no, Street, Area" style="padding:.65rem 1rem;border:1.5px solid #ddd0bb;border-radius:8px;font-size:.88rem;background:#fdf8f0;outline:none;width:100%;resize:vertical;font-family:inherit;"></textarea></div>
       </div>
 
       <div class="form-row">
@@ -85,11 +101,20 @@
       const payload = { name, email: document.getElementById('email').value, password: pwd, role,
         phone: document.getElementById('phone').value };
       if(role==='farmer'){
-        payload.village   = document.getElementById('village').value;
-        payload.district  = document.getElementById('district').value;
-        payload.farm_size = document.getElementById('farmSize').value || undefined;
+        payload.village          = document.getElementById('village').value;
+        payload.district         = document.getElementById('district').value;
+        payload.farm_size        = document.getElementById('farmSize').value || undefined;
+        payload.state            = document.getElementById('farmerState').value;
+        payload.pincode          = document.getElementById('farmerPincode').value;
+        payload.crop_type        = document.getElementById('cropType').value;
+        payload.experience_years = document.getElementById('expYears').value || undefined;
+        payload.full_address     = document.getElementById('farmerAddress').value;
       } else {
-        payload.city = document.getElementById('custCity').value;
+        payload.city         = document.getElementById('custCity').value;
+        payload.district_cust= document.getElementById('custDistrict').value;
+        payload.state        = document.getElementById('custState').value;
+        payload.pincode      = document.getElementById('custPincode').value;
+        payload.address      = document.getElementById('custAddress').value;
       }
       await register(payload);
       window.location.href = role==='farmer' ? '/farmer/' : '/customer/';
