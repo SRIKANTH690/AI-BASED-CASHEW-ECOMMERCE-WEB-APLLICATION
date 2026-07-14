@@ -1,0 +1,14 @@
+@import url('portal.css');
+body { background: linear-gradient(160deg, rgba(20,50,22,.96) 0%, rgba(35,85,40,.88) 40%, rgba(100,140,60,.6) 100%), url('https://images.unsplash.com/photo-1611080626919-7cf5a9dbab12?w=1200&q=70') center/cover no-repeat fixed; min-height:100vh; }
+.auth-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+.auth-card { background:var(--white); border-radius:var(--r-xl); padding:2.5rem 2rem; width:100%; max-width:440px; box-shadow:0 24px 80px rgba(0,0,0,.35); }
+.auth-logo { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:700; color:var(--brown-dk); margin-bottom:1.5rem; text-align:center; }
+.auth-logo span { color:var(--forest-mid); }
+.auth-logo sup { font-size:.5rem; color:var(--gold); vertical-align:super; }
+.auth-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--brown-dk); text-align:center; margin-bottom:.3rem; }
+.auth-sub { color:var(--muted); font-size:.88rem; text-align:center; margin-bottom:1.5rem; }
+.role-tabs { display:flex; gap:.5rem; background:var(--warm); padding:.4rem; border-radius:var(--r-md); margin-bottom:1.5rem; }
+.role-tab { flex:1; padding:.55rem; border:none; background:none; font-size:.85rem; font-weight:600; color:var(--muted); border-radius:var(--r-sm); cursor:pointer; transition:background .2s,color .2s; }
+.role-tab.active { background:var(--white); color:var(--forest-mid); box-shadow:var(--shadow-sm); }
+.auth-link { text-align:center; font-size:.82rem; color:var(--muted); margin-top:1rem; }
+.auth-link a { color:var(--forest-mid); font-weight:600; }

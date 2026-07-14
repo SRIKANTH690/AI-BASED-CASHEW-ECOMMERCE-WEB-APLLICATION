@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Panel — Panruti Cashews</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<link rel="stylesheet" href="../css/admin.css?v=3"/>
+</head>
+<body>
+<nav id="navbar">
+  <div class="nav-inner container">
+    <div class="nav-logo">பண்ருட்டி <span>முந்திரி</span><sup>™</sup> <span style="font-size:.65rem;background:var(--gold);color:#fff;padding:.15rem .5rem;border-radius:10px;margin-left:.4rem;">ADMIN</span></div>
+    <div class="nav-actions">
+      <span class="user-chip admin" id="adminChip"></span>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="portal-layout container" style="padding-top:90px;">
+  <aside class="portal-sidebar">
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-item active" onclick="showTab('dashboard',this)"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+      <div class="sidebar-nav-item" onclick="showTab('pending',this)"><i class="fas fa-clock"></i> Pending <span class="badge-count" id="pendingBadge">0</span></div>
+      <div class="sidebar-nav-item" onclick="showTab('approved',this)"><i class="fas fa-check-circle"></i> Approved</div>
+      <div class="sidebar-nav-item" onclick="showTab('farmers',this)"><i class="fas fa-users"></i> Farmers</div>
+      <div class="sidebar-nav-item" onclick="showTab('customers',this)"><i class="fas fa-user-tag"></i> Customers</div>
+      <div class="sidebar-nav-item" onclick="showTab('orders',this)"><i class="fas fa-shopping-bag"></i> Orders</div>
+    </nav>
+  </aside>
+
+  <main class="portal-main">
+    <!-- Dashboard -->
+    <div class="tab-section active" id="tab-dashboard">
+      <div class="section-tag">Overview</div>
+      <h2 class="section-title">Admin Dashboard</h2>
+      <div class="stats-row" id="adminStats"></div>
+      <div style="margin-top:2rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <h3 style="font-family:'Playfair Display',serif;">⏰ Recent Pending Submissions</h3>
+          <button onclick="showTab('pending', document.querySelectorAll('.sidebar-nav-item')[1])" style="background:var(--forest-mid);color:#fff;border:none;padding:.4rem 1rem;border-radius:var(--r-sm);font-size:.8rem;font-weight:600;cursor:pointer;">View All →</button>
+        </div>
+        <div id="dashPendingList" style="display:flex;flex-direction:column;gap:1rem;"><p style="color:var(--muted)">Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- Pending -->
+    <div class="tab-section" id="tab-pending">
+      <div class="section-tag">Review</div>
+      <h2 class="section-title">Pending Approvals</h2>
+      <p class="section-sub">Review farmer submissions with AI quality predictions before approving.</p>
+      <div id="pendingList" style="margin-top:1.5rem;display:flex;flex-direction:column;gap:1rem;"></div>
+    </div>
+
+    <!-- Approved -->
+    <div class="tab-section" id="tab-approved">
+      <div class="section-tag">Live</div>
+      <h2 class="section-title">Approved Products</h2>
+      <div id="approvedList" style="margin-top:1.5rem;"></div>
+    </div>
+
+    <!-- Farmers -->
+    <div class="tab-section" id="tab-farmers">
+      <div class="section-tag">Users</div>
+      <h2 class="section-title">Registered Farmers</h2>
+      <div id="farmersList" style="margin-top:1.5rem;"></div>
+    </div>
+
+    <!-- Customers -->
+    <div class="tab-section" id="tab-customers">
+      <div class="section-tag">Users</div>
+      <h2 class="section-title">Registered Customers</h2>
+      <div id="customersList" style="margin-top:1.5rem;"></div>
+    </div>
+
+    <!-- Orders -->
+    <div class="tab-section" id="tab-orders">
+      <div class="section-tag">Commerce</div>
+      <h2 class="section-title">All Orders</h2>
+      <div id="ordersList" style="margin-top:1.5rem;"></div>
+    </div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/api.js?v=3"></script>
+<script src="../js/admin.js?v=3"></script>
+</body>
+</html>

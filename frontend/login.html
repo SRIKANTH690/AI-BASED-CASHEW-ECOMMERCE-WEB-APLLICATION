@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Login — Panruti Cashews</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="css/auth.css"/>
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">பண்ருட்டி <span>முந்திரி</span><sup>™</sup></div>
+    <h2 class="auth-title">Welcome Back</h2>
+    <p class="auth-sub">Login to your account</p>
+
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="setRole('farmer',this)">🌾 Farmer</button>
+      <button class="role-tab" onclick="setRole('customer',this)">🛒 Customer</button>
+      <button class="role-tab" onclick="setRole('admin',this)">⚙ Admin</button>
+    </div>
+    <input type="hidden" id="selectedRole" value="farmer"/>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com" required/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" required/>
+      </div>
+      <div id="errorMsg" style="color:#c62828;font-size:.82rem;margin-bottom:.8rem;display:none;"></div>
+      <button type="submit" class="btn-submit" id="loginBtn">Login</button>
+    </form>
+    <p class="auth-link">Don't have an account? <a href="register.html">Register here</a></p>
+    <p class="auth-link" style="margin-top:.3rem;"><a href="/">← Back to Home</a></p>
+  </div>
+</div>
+<script src="js/api.js?v=3"></script>
+<script>
+  // Show error if redirected due to wrong role
+  (function(){
+    const params = new URLSearchParams(window.location.search);
+    if(params.get('error') === 'wrong_role'){
+      const need = params.get('need') || '';
+      const errEl = document.getElementById('errorMsg');
+      errEl.textContent = `Please login as ${need}. Your previous session was for a different role.`;
+      errEl.style.display = 'block';
+      // Auto-select the correct role tab
+      const tabs = document.querySelectorAll('.role-tab');
+      tabs.forEach(t => t.classList.remove('active'));
+      const idx = need==='farmer'?0:need==='customer'?1:2;
+      if(tabs[idx]) { tabs[idx].classList.add('active'); document.getElementById('selectedRole').value=need; }
+    }
+  })();
+
+  // Redirect if already logged in with correct role
+  (function(){
+    const u = getUser();
+    if(u && !new URLSearchParams(window.location.search).get('error')) redirect(u.role);
+  })();
+
+  function redirect(role){
+    if(role==='farmer')     window.location.href='/farmer/';
+    else if(role==='admin') window.location.href='/admin/';
+    else                    window.location.href='/customer/';
+  }
+
+  function setRole(role, el){
+    document.getElementById('selectedRole').value = role;
+    document.querySelectorAll('.role-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  async function handleLogin(e){
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    const errEl = document.getElementById('errorMsg');
+    errEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Logging in…';
+    try {
+      const data = await login(
+        document.getElementById('email').value,
+        document.getElementById('password').value
+      );
+      const role = document.getElementById('selectedRole').value;
+      if(data.user.role !== role){
+        removeToken(); removeUser();
+        errEl.textContent = `This account is a ${data.user.role}. Please select the "${data.user.role}" tab above.`;
+        errEl.style.display='block';
+        btn.disabled=false; btn.textContent='Login'; return;
+      }
+      redirect(data.user.role);
+    } catch(err){
+      errEl.textContent = err.message;
+      errEl.style.display = 'block';
+      btn.disabled=false; btn.textContent='Login';
+    }
+  }
+</script>
+</body>
+</html>

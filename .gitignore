@@ -1,0 +1,31 @@
+# Dependencies
+backend/node_modules/
+
+# Environment variables (NEVER commit this)
+backend/.env
+
+# Uploaded images
+backend/uploads/
+
+# Python cache
+ai-service/__pycache__/
+ai-service/*.pyc
+ai-service/.pytest_cache/
+
+# AI Model files (too large for git)
+ai-service/model/*.pkl
+ai-service/model/*.h5
+ai-service/model/*.pt
+ai-service/model/training_plot.png
+ai-service/model/feature_importance.png
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*

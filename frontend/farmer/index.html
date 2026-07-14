@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Farmer Portal — Panruti Cashews</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<link rel="stylesheet" href="../css/farmer.css"/>
+</head>
+<body>
+<nav id="navbar">
+  <div class="nav-inner container">
+    <div class="nav-logo">பண்ருட்டி <span>முந்திரி</span><sup>™</sup></div>
+    <div class="nav-actions">
+      <span class="user-chip farmer" id="farmerChip"></span>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="portal-layout container" style="padding-top:90px;">
+  <!-- Sidebar -->
+  <aside class="portal-sidebar">
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-item active" onclick="showTab('upload',this)"><i class="fas fa-upload"></i> Upload Product</div>
+      <div class="sidebar-nav-item" onclick="showTab('myproducts',this)"><i class="fas fa-boxes"></i> My Products</div>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="portal-main">
+    <!-- Upload Tab -->
+    <div class="tab-section active" id="tab-upload">
+      <div class="section-tag">Farmer Tools</div>
+      <h2 class="section-title">Upload Cashew Product</h2>
+      <p class="section-sub">Fill in details and upload an image. Your product goes to admin for approval.</p>
+
+      <div class="upload-grid">
+        <form id="uploadForm" class="upload-form card">
+          <!-- Image Upload -->
+          <div class="checkout-section-title">Cashew Image <span style="color:#c62828">*</span></div>
+          <div class="upload-box" id="uploadBox">
+            <div id="uploadBoxContent">
+              <div style="font-size:3rem;margin-bottom:.5rem;">📸</div>
+              <h3>Upload Cashew Image</h3>
+              <p>Click or drag &amp; drop — JPG, PNG, WEBP up to 10MB</p>
+            </div>
+            <input type="file" id="imageInput" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"/>
+          </div>
+          <div id="previewWrap" style="display:none;margin-bottom:1.2rem;border-radius:12px;overflow:hidden;border:2px solid var(--forest-mid);position:relative;">
+            <img id="previewImg" style="width:100%;max-height:220px;object-fit:cover;display:block;"/>
+            <button type="button" onclick="clearImage()" style="position:absolute;top:.5rem;right:.5rem;background:rgba(198,40,40,.85);color:#fff;border:none;border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-size:.75rem;">✕ Remove</button>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Product Name <span style="color:#c62828">*</span></label>
+              <input type="text" id="productName" placeholder="e.g. Premium W240 Cashews" required/>
+            </div>
+            <div class="form-group">
+              <label>Cashew Grade <span style="color:#c62828">*</span></label>
+              <select id="grade" required>
+                <option value="">Select grade</option>
+                <option>W180</option><option>W210</option><option>W240</option>
+                <option>W450</option><option>Broken</option><option>WBB</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Quantity (kg) <span style="color:#c62828">*</span></label>
+              <input type="number" id="quantity" placeholder="500" min="1" required/>
+            </div>
+            <div class="form-group">
+              <label>Price per kg (₹) <span style="color:#c62828">*</span></label>
+              <input type="number" id="price" placeholder="850" min="1" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Quality Description</label>
+            <textarea id="description" rows="3" placeholder="Describe quality, appearance, storage..."></textarea>
+          </div>
+
+          <!-- GPS Location -->
+          <div class="form-group">
+            <label>GPS Location</label>
+            <div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;">
+              <button type="button" class="btn-gps" onclick="captureGPS()"><i class="fas fa-map-marker-alt"></i> Capture My Location</button>
+              <span id="gpsStatus" style="font-size:.8rem;color:var(--muted);">Not captured yet</span>
+            </div>
+            <input type="hidden" id="latitude"/>
+            <input type="hidden" id="longitude"/>
+            <div id="gpsDisplay" style="display:none;margin-top:.6rem;background:var(--warm);padding:.6rem 1rem;border-radius:8px;font-size:.82rem;color:var(--brown);border:1px solid var(--border);"></div>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <i class="fas fa-paper-plane"></i> Submit for Admin Approval
+          </button>
+          <p style="text-align:center;margin-top:.7rem;font-size:.74rem;color:var(--muted);">
+            <i class="fas fa-info-circle" style="color:var(--gold)"></i>
+            Your product appears in the marketplace only after admin approval.
+          </p>
+        </form>
+
+        <!-- AI Info Panel -->
+        <div class="info-panel">
+          <div class="card" style="margin-bottom:1.2rem;">
+            <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--brown-dk);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;">
+              <span style="background:var(--forest);color:#fff;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;">🤖</span> AI Quality Prediction
+            </div>
+            <p style="font-size:.82rem;color:var(--muted);line-height:1.65;">When you upload a cashew image, our AI model automatically analyses it and predicts the grade, quality score, and confidence percentage. The admin sees this prediction alongside your submission.</p>
+            <div id="aiResultBox" style="display:none;margin-top:1rem;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:1px solid #a5d6a7;border-radius:10px;padding:1rem;">
+              <div style="font-weight:700;color:#2e7d32;margin-bottom:.5rem;"><i class="fas fa-robot"></i> AI Prediction Result</div>
+              <div id="aiResultContent"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-family:'Playfair Display',serif;font-size:.95rem;color:var(--brown-dk);margin-bottom:.8rem;">Grade Price Reference</div>
+            <div style="display:flex;flex-direction:column;gap:.4rem;font-size:.8rem;">
+              <div class="grade-ref-row"><span class="grade-pill">W180</span><span style="color:var(--muted)">Very Large · ₹1,250/kg</span></div>
+              <div class="grade-ref-row"><span class="grade-pill">W210</span><span style="color:var(--muted)">Large · ₹1,050/kg</span></div>
+              <div class="grade-ref-row"><span class="grade-pill">W240</span><span style="color:var(--muted)">Medium-Large · ₹920/kg</span></div>
+              <div class="grade-ref-row"><span class="grade-pill">W450</span><span style="color:var(--muted)">Small · ₹620/kg</span></div>
+              <div class="grade-ref-row"><span class="grade-pill">Broken</span><span style="color:var(--muted)">Mixed · ₹380/kg</span></div>
+              <div class="grade-ref-row" style="background:#fff8e1;border-color:#f9a825;"><span class="grade-pill" style="background:var(--amber);">WBB</span><span style="color:var(--muted)">Baby Bits · ₹400/kg</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Products Tab -->
+    <div class="tab-section" id="tab-myproducts">
+      <div class="section-tag">My Listings</div>
+      <h2 class="section-title">My Products</h2>
+      <p class="section-sub">Track status of your submitted cashew batches.</p>
+      <div class="stats-row" id="myStats"></div>
+
+      <!-- Rejection notice banner -->
+      <div id="rejectionNotice" style="display:none;background:#fce4ec;border:1.5px solid #f8bbd0;border-radius:var(--r-md);padding:1rem 1.2rem;margin-top:1rem;gap:.8rem;align-items:flex-start;"></div>
+
+      <div class="table-wrap" style="margin-top:1.5rem;">
+        <table class="data-table" id="myProductsTable">
+          <thead><tr><th>Image</th><th>Product</th><th>Grade</th><th>Qty</th><th>Price</th><th>Harvest</th><th>Submitted</th><th>Status</th></tr></thead>
+          <tbody id="myProductsBody"><tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/api.js"></script>
+<script src="../js/farmer.js"></script>
+</body>
+</html>

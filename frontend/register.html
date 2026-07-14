@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Register — Panruti Cashews</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="css/auth.css"/>
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card" style="max-width:520px;">
+    <div class="auth-logo">பண்ருட்டி <span>முந்திரி</span><sup>™</sup></div>
+    <h2 class="auth-title">Create Account</h2>
+    <p class="auth-sub">Join as a Farmer or Customer</p>
+
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="setRole('farmer',this)">🌾 Farmer</button>
+      <button class="role-tab" onclick="setRole('customer',this)">🛒 Customer</button>
+    </div>
+    <input type="hidden" id="selectedRole" value="farmer"/>
+
+    <form id="regForm" onsubmit="handleRegister(event)">
+      <!-- Farmer fields -->
+      <div id="farmerFields">
+        <div class="form-row">
+          <div class="form-group"><label>Farmer Name *</label><input type="text" id="farmerName" placeholder="Murugan Selvam"/></div>
+          <div class="form-group"><label>Village</label><input type="text" id="village" placeholder="Panruti"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>District</label><input type="text" id="district" placeholder="Cuddalore"/></div>
+          <div class="form-group"><label>Farm Size (acres)</label><input type="number" id="farmSize" placeholder="5" min="0"/></div>
+        </div>
+      </div>
+      <!-- Customer fields -->
+      <div id="customerFields" style="display:none;">
+        <div class="form-row">
+          <div class="form-group"><label>Full Name *</label><input type="text" id="custName" placeholder="Raj Kumar"/></div>
+          <div class="form-group"><label>City</label><input type="text" id="custCity" placeholder="Chennai"/></div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group"><label>Email *</label><input type="email" id="email" placeholder="you@example.com" required/></div>
+        <div class="form-group"><label>Mobile *</label><input type="tel" id="phone" placeholder="98765 43210" maxlength="10" required/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Password *</label><input type="password" id="password" placeholder="Min 6 characters" required/></div>
+        <div class="form-group"><label>Confirm Password *</label><input type="password" id="confirm" placeholder="••••••••" required/></div>
+      </div>
+      <div id="errorMsg" style="color:#c62828;font-size:.82rem;margin-bottom:.8rem;display:none;"></div>
+      <button type="submit" class="btn-submit" id="regBtn">Create Account</button>
+    </form>
+    <p class="auth-link">Already have an account? <a href="login.html">Login here</a></p>
+    <p class="auth-link" style="margin-top:.3rem;"><a href="/">← Back to Home</a></p>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script>
+  function setRole(role, el){
+    document.getElementById('selectedRole').value = role;
+    document.querySelectorAll('.role-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('farmerFields').style.display  = role==='farmer' ? 'block' : 'none';
+    document.getElementById('customerFields').style.display = role==='customer' ? 'block' : 'none';
+  }
+
+  async function handleRegister(e){
+    e.preventDefault();
+    const errEl = document.getElementById('errorMsg');
+    const btn   = document.getElementById('regBtn');
+    errEl.style.display = 'none';
+    const role = document.getElementById('selectedRole').value;
+    const pwd  = document.getElementById('password').value;
+    const conf = document.getElementById('confirm').value;
+    if(pwd !== conf){ errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return; }
+    if(pwd.length < 6){ errEl.textContent='Password must be at least 6 characters.'; errEl.style.display='block'; return; }
+    const name = role==='farmer'
+      ? document.getElementById('farmerName').value.trim()
+      : document.getElementById('custName').value.trim();
+    if(!name){ errEl.textContent='Please enter your name.'; errEl.style.display='block'; return; }
+    btn.disabled=true; btn.textContent='Creating account…';
+    try {
+      const payload = { name, email: document.getElementById('email').value, password: pwd, role,
+        phone: document.getElementById('phone').value };
+      if(role==='farmer'){
+        payload.village   = document.getElementById('village').value;
+        payload.district  = document.getElementById('district').value;
+        payload.farm_size = document.getElementById('farmSize').value || undefined;
+      } else {
+        payload.city = document.getElementById('custCity').value;
+      }
+      await register(payload);
+      window.location.href = role==='farmer' ? '/farmer/' : '/customer/';
+    } catch(err){
+      errEl.textContent = err.message; errEl.style.display='block';
+      btn.disabled=false; btn.textContent='Create Account';
+    }
+  }
+</script>
+</body>
+</html>

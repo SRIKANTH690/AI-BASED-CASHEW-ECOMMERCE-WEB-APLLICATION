@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Customer Portal — Panruti Cashews</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="../css/customer.css"/>
+</head>
+<body>
+<nav id="navbar">
+  <div class="nav-inner container">
+    <div class="nav-logo">பண்ருட்டி <span>முந்திரி</span><sup>™</sup></div>
+    <div class="nav-actions">
+      <button class="btn-nav-cart" onclick="showTab('cart',null)">
+        🛒 Cart <span id="cartCountNav" style="background:rgba(255,255,255,.3);padding:.05rem .45rem;border-radius:10px;font-size:.72rem;margin-left:.3rem;">0</span>
+      </button>
+      <span class="user-chip customer" id="customerChip"></span>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="portal-layout container" style="padding-top:90px;">
+  <aside class="portal-sidebar">
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-item active" onclick="showTab('marketplace',this)"><i class="fas fa-store"></i> Marketplace</div>
+      <div class="sidebar-nav-item" onclick="showTab('cart',this)"><i class="fas fa-shopping-cart"></i> My Cart</div>
+      <div class="sidebar-nav-item" onclick="showTab('orders',this)"><i class="fas fa-box"></i> My Orders</div>
+    </nav>
+  </aside>
+
+  <main class="portal-main">
+    <!-- Marketplace -->
+    <div class="tab-section active" id="tab-marketplace">
+      <div class="section-tag">Live Listings</div>
+      <h2 class="section-title">Farmer Marketplace</h2>
+      <p class="section-sub">Browse admin-verified cashew listings directly from Panruti farmers.</p>
+      <div class="marketplace-filters" style="margin:1.5rem 0;">
+        <input type="text" id="searchInput" class="filter-search" placeholder="Search grade, farmer, location…" oninput="filterProducts()"/>
+        <select id="gradeFilter" class="filter-select" onchange="filterProducts()">
+          <option value="">All Grades</option>
+          <option>W180</option><option>W210</option><option>W240</option>
+          <option>W450</option><option>Broken</option><option>WBB</option>
+        </select>
+        <select id="priceFilter" class="filter-select" onchange="filterProducts()">
+          <option value="">All Prices</option>
+          <option value="low">Under ₹700/kg</option>
+          <option value="mid">₹700–₹1000/kg</option>
+          <option value="high">Above ₹1000/kg</option>
+        </select>
+      </div>
+      <div class="products-grid" id="productsGrid">
+        <p style="color:var(--muted)">Loading products…</p>
+      </div>
+    </div>
+
+    <!-- Cart -->
+    <div class="tab-section" id="tab-cart">
+      <div class="section-tag">Shopping</div>
+      <h2 class="section-title">Your Cart</h2>
+      <div id="cartContent"></div>
+    </div>
+
+    <!-- Checkout (shown inside cart tab) -->
+    <div class="tab-section" id="tab-checkout">
+      <div class="section-tag">Checkout</div>
+      <h2 class="section-title">Complete Your Order</h2>
+      <div class="checkout-grid">
+        <div id="checkoutSummary" class="card" style="margin-bottom:1.5rem;"></div>
+        <form id="checkoutForm" class="card" onsubmit="placeOrderHandler(event)">
+          <div class="checkout-section-title">Delivery Details</div>
+          <div class="form-group"><label>Full Name *</label><input type="text" id="ckName" required/></div>
+          <div class="form-group"><label>Mobile Number *</label><input type="tel" id="ckMobile" pattern="[0-9]{10}" maxlength="10" required/></div>
+          <div class="form-group"><label>Address *</label><textarea id="ckAddress" rows="2" required></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>City *</label><input type="text" id="ckCity" required/></div>
+            <div class="form-group"><label>State *</label><input type="text" id="ckState" required/></div>
+          </div>
+          <div class="form-group" style="max-width:180px;"><label>PIN Code *</label><input type="text" id="ckPin" pattern="[0-9]{6}" maxlength="6" required/></div>
+          <div class="checkout-section-title">Payment Method</div>
+          <div class="payment-options">
+            <label class="payment-opt active"><input type="radio" name="pay" value="COD" checked onchange="selectPay(this)"/><div><div class="payment-opt-label">💵 Cash on Delivery</div><div class="payment-opt-desc">Pay when your order arrives</div></div></label>
+            <label class="payment-opt"><input type="radio" name="pay" value="UPI" onchange="selectPay(this)"/><div><div class="payment-opt-label">📱 UPI</div><div class="payment-opt-desc">Google Pay, PhonePe, Paytm</div></div></label>
+            <label class="payment-opt"><input type="radio" name="pay" value="Card" onchange="selectPay(this)"/><div><div class="payment-opt-label">💳 Card / Net Banking</div><div class="payment-opt-desc">Credit, Debit or Net Banking</div></div></label>
+          </div>
+          <button type="submit" class="btn-submit"><i class="fas fa-lock"></i> Place Order</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="tab-section" id="tab-orders">
+      <div class="section-tag">History</div>
+      <h2 class="section-title">My Orders</h2>
+      <div id="ordersList" style="margin-top:1.5rem;"></div>
+    </div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/api.js"></script>
+<script src="../js/customer.js"></script>
+</body>
+</html>
