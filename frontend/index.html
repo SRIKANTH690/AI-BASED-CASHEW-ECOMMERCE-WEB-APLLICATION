@@ -2850,12 +2850,32 @@ function placeOrderFinal(e){
     }
   }
 
+  // Check cart has valid marketplace products
+  const validItems = cart.filter(i=>{
+    const rawId = i.id.toString().replace('p','');
+    return !isNaN(parseInt(rawId)) && parseInt(rawId) > 0;
+  });
+  if(!validItems.length){
+    showToast('Please add products from the Farmer Marketplace to place an order.','error');
+    return;
+  }
+
   const token = localStorage.getItem('cashew_token');
   const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
   const upiTxn = selectedPayMethod === 'UPI' ? (document.getElementById('upiTxnId')?.value||'').trim() : null;
 
   const payload = {
-    items: cart.map(i=>({ product_id: parseInt(i.id.toString().replace('p','')), qty: i.qty, price: i.price })),
+    items: cart
+      .filter(i => {
+        // Only include items from the marketplace (real DB products with numeric IDs)
+        const rawId = i.id.toString().replace('p','');
+        return !isNaN(parseInt(rawId)) && parseInt(rawId) > 0;
+      })
+      .map(i => ({
+        product_id: parseInt(i.id.toString().replace('p','')),
+        qty:   i.qty,
+        price: i.price
+      })),
     total,
     payment_method: selectedPayMethod + (upiTxn ? ` (Txn: ${upiTxn})` : ''),
     address:  document.getElementById('ckAddress').value,
