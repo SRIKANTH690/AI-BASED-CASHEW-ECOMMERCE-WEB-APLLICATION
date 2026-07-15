@@ -3,7 +3,12 @@
  * All fetch() calls go through these functions.
  */
 
-const API_BASE = 'http://localhost:5000/api';
+// Auto-detect backend URL:
+// - On localhost → use localhost:5000
+// - On Render/production → use same origin (backend serves frontend)
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:5000/api'
+  : window.location.origin + '/api';
 
 // ── Token helpers ─────────────────────────────────────────
 function getToken()        { return localStorage.getItem('cashew_token'); }

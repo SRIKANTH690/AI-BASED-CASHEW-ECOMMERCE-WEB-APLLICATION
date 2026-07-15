@@ -1228,6 +1228,13 @@ body.hide-buy .btn-buy,body.hide-buy .btn-contact,body.hide-buy #cartBubble,body
 
 <script>
 /* =========================================================
+   BACKEND URL — auto-detects local vs production
+   ========================================================= */
+const BACKEND = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? '${BACKEND}'
+  : window.location.origin;
+
+/* =========================================================
    STATE MANAGEMENT (using localStorage for persistence)
    ========================================================= */
 const STORE = {
@@ -1476,7 +1483,7 @@ function handleRegister(e){
   const btn = document.querySelector('#registerSubmitBtn');
   if(btn){ btn.disabled=true; btn.textContent='Registering…'; }
 
-  fetch('http://localhost:5000/api/register',{
+  fetch(`${BACKEND}/api/register`,{
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify(payload)
   })
@@ -1505,7 +1512,7 @@ function handleLogin(e){
   const btn      = document.querySelector('#loginSubmitBtn');
   if(btn){ btn.disabled=true; btn.textContent='Logging in…'; }
 
-  fetch('http://localhost:5000/api/login',{
+  fetch(`${BACKEND}/api/login`,{
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({email, password})
   })
@@ -1558,7 +1565,7 @@ function handleAdminLogin(e){
   btn.disabled   = true;
   btn.textContent = 'Logging in…';
 
-  fetch('http://localhost:5000/api/login',{
+  fetch(`${BACKEND}/api/login`,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({email, password})
@@ -1851,7 +1858,7 @@ function renderMarketplace(filter){
   const grid = document.getElementById('marketplaceGrid');
   grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:3rem;"><i class="fas fa-spinner fa-spin"></i> Loading marketplace…</p>';
 
-  fetch('http://localhost:5000/api/customer/products')
+  fetch(`${BACKEND}/api/customer/products`)
     .then(r => r.json())
     .then(data => {
       _allMarketProducts = data.products || [];
@@ -1870,7 +1877,7 @@ function _renderMarketGrid(data){
   }
   grid.innerHTML = data.map(l => {
     const initials = (l.farmer_name||'F').split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
-    const imgSrc   = l.image_url ? (l.image_url.startsWith('/') ? 'http://localhost:5000' + l.image_url : l.image_url) : '';
+    const imgSrc   = l.image_url ? (l.image_url.startsWith('/') ? '${BACKEND}' + l.image_url : l.image_url) : '';
     return `
     <div class="market-card reveal">
       <div class="market-card-img">
@@ -1913,7 +1920,7 @@ function customerBuyAction(farmer, id){
   }
   const product = _allMarketProducts.find(p=>p.id===id);
   if(product){
-    const imgSrc = product.image_url ? (product.image_url.startsWith('/') ? 'http://localhost:5000'+product.image_url : product.image_url) : '';
+    const imgSrc = product.image_url ? (product.image_url.startsWith('/') ? '${BACKEND}'+product.image_url : product.image_url) : '';
     addToCart('p'+id, `${product.product_name||product.grade+' Cashews'} (${farmer})`, parseFloat(product.price), imgSrc);
     showToast(`${product.product_name||product.grade} added to cart!`,'success');
   }
@@ -2038,7 +2045,7 @@ function submitFarmerProduct(e){
   // Get JWT token for farmer
   const token = localStorage.getItem('farmer_jwt') || localStorage.getItem('cashew_token');
 
-  fetch('http://localhost:5000/api/farmer/upload', {
+  fetch(`${BACKEND}/api/farmer/upload`, {
     method: 'POST',
     headers: token ? { Authorization: 'Bearer ' + token } : {},
     body: formData
@@ -2079,7 +2086,7 @@ function renderFarmerDashboard(){
   statsEl.innerHTML = '<div style="color:var(--muted);font-size:.85rem;padding:.5rem;">Loading…</div>';
   tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)"><i class="fas fa-spinner fa-spin"></i> Loading products…</td></tr>';
 
-  fetch('http://localhost:5000/api/farmer/products', {
+  fetch(`${BACKEND}/api/farmer/products`, {
     headers: token ? { Authorization: 'Bearer ' + token } : {}
   })
   .then(r => r.json())
@@ -2143,7 +2150,7 @@ function renderFarmerDashboard(){
 function deleteFarmerProduct(id){
   if(!confirm('Delete this product? This cannot be undone.')) return;
   const token = localStorage.getItem('farmer_jwt') || localStorage.getItem('cashew_token');
-  fetch(`http://localhost:5000/api/farmer/delete/${id}`, {
+  fetch(`${BACKEND}/api/farmer/delete/${id}`, {
     method: 'DELETE',
     headers: token ? { Authorization: 'Bearer ' + token } : {}
   })
@@ -2176,8 +2183,8 @@ function renderAdminContent(section){
 
   if(section==='dashboard'){
     Promise.all([
-      fetch('http://localhost:5000/api/admin/stats',{headers:h}).then(r=>r.json()),
-      fetch('http://localhost:5000/api/admin/pending',{headers:h}).then(r=>r.json())
+      fetch(`${BACKEND}/api/admin/stats`,{headers:h}).then(r=>r.json()),
+      fetch(`${BACKEND}/api/admin/pending`,{headers:h}).then(r=>r.json())
     ]).then(([statsData, pendingData])=>{
       const s = statsData.stats||{};
       const pending = pendingData.products||[];
@@ -2201,7 +2208,7 @@ function renderAdminContent(section){
     }).catch(e=>{ main.innerHTML=`<p style="color:var(--muted);padding:2rem;">Error: ${e.message}</p>`; });
 
   } else if(section==='pending'){
-    fetch('http://localhost:5000/api/admin/pending',{headers:h}).then(r=>r.json()).then(data=>{
+    fetch(`${BACKEND}/api/admin/pending`,{headers:h}).then(r=>r.json()).then(data=>{
       const pending = data.products||[];
       const badge = document.getElementById('pendingCount');
       if(badge) badge.textContent = pending.length;
@@ -2215,7 +2222,7 @@ function renderAdminContent(section){
     }).catch(e=>{ main.innerHTML=`<p style="color:var(--muted);padding:2rem;">Error: ${e.message}</p>`; });
 
   } else if(section==='approved'){
-    fetch('http://localhost:5000/api/customer/products',{headers:h}).then(r=>r.json()).then(data=>{
+    fetch(`${BACKEND}/api/customer/products`,{headers:h}).then(r=>r.json()).then(data=>{
       const approved = data.products||[];
       main.innerHTML=`
         <div style="margin-bottom:1.5rem;">
@@ -2241,7 +2248,7 @@ function renderAdminContent(section){
     }).catch(e=>{ main.innerHTML=`<p style="color:var(--muted);padding:2rem;">Error: ${e.message}</p>`; });
 
   } else if(section==='orders'){
-    fetch('http://localhost:5000/api/admin/orders',{headers:h}).then(r=>r.json()).then(data=>{
+    fetch(`${BACKEND}/api/admin/orders`,{headers:h}).then(r=>r.json()).then(data=>{
       const orders = data.orders||[];
       main.innerHTML=`
         <div style="margin-bottom:1.5rem;">
@@ -2285,7 +2292,7 @@ function renderAdminContent(section){
                       <div style="display:flex;flex-direction:column;gap:.4rem;">
                         ${(o.items||[]).filter(i=>i&&i.product_id).map(i=>`
                           <div style="display:flex;align-items:center;gap:.6rem;background:var(--cream);padding:.4rem .7rem;border-radius:var(--r-sm);">
-                            ${i.image_url?`<img src="http://localhost:5000${i.image_url}" style="width:36px;height:36px;object-fit:cover;border-radius:5px;flex-shrink:0;" onerror="this.style.display='none'"/>`:'<div style="width:36px;height:36px;background:var(--beige);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;">🌰</div>'}
+                            ${i.image_url?`<img src="${BACKEND}${i.image_url}" style="width:36px;height:36px;object-fit:cover;border-radius:5px;flex-shrink:0;" onerror="this.style.display='none'"/>`:'<div style="width:36px;height:36px;background:var(--beige);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;">🌰</div>'}
                             <div style="flex:1;min-width:0;">
                               <div style="font-size:.82rem;font-weight:600;color:var(--brown-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i.product_name||'Cashew Product'}</div>
                               <div style="font-size:.72rem;color:var(--muted);">${i.grade||'—'} &nbsp;·&nbsp; ${i.qty}kg @ ₹${i.price}/kg</div>
@@ -2305,7 +2312,7 @@ function renderAdminContent(section){
     }).catch(e=>{ main.innerHTML=`<p style="color:var(--muted);padding:2rem;">Error: ${e.message}</p>`; });
 
   } else if(section==='farmers'){
-    fetch('http://localhost:5000/api/admin/farmers',{headers:h}).then(r=>r.json()).then(data=>{
+    fetch(`${BACKEND}/api/admin/farmers`,{headers:h}).then(r=>r.json()).then(data=>{
       const farmers = data.farmers||[];
       main.innerHTML=`
         <div style="margin-bottom:1.5rem;">
@@ -2337,7 +2344,7 @@ function renderAdminContent(section){
     }).catch(e=>{ main.innerHTML=`<p style="color:var(--muted);padding:2rem;">Error: ${e.message}</p>`; });
 
   } else if(section==='customers'){
-    fetch('http://localhost:5000/api/admin/customers',{headers:h}).then(r=>r.json()).then(data=>{
+    fetch(`${BACKEND}/api/admin/customers`,{headers:h}).then(r=>r.json()).then(data=>{
       const customers = data.customers||[];
       main.innerHTML=`
         <div style="margin-bottom:1.5rem;">
@@ -2367,7 +2374,7 @@ function renderAdminContent(section){
     }).catch(e=>{ main.innerHTML=`<p style="color:var(--muted);padding:2rem;">Error: ${e.message}</p>`; });
 
   } else if(section==='liveproducts'){
-    fetch('http://localhost:5000/api/customer/products',{headers:h}).then(r=>r.json()).then(data=>{
+    fetch(`${BACKEND}/api/customer/products`,{headers:h}).then(r=>r.json()).then(data=>{
       const products = data.products||[];
       main.innerHTML=`
         <div style="margin-bottom:1.5rem;">
@@ -2401,7 +2408,7 @@ function renderAdminContent(section){
     }).catch(e=>{ main.innerHTML=`<p style="color:var(--muted);padding:2rem;">Error: ${e.message}</p>`; });
 
   } else if(section==='enquiries'){
-    fetch('http://localhost:5000/api/admin/enquiries',{headers:h}).then(r=>r.json()).then(data=>{
+    fetch(`${BACKEND}/api/admin/enquiries`,{headers:h}).then(r=>r.json()).then(data=>{
       const enquiries = data.enquiries||[];
       main.innerHTML=`
         <div style="margin-bottom:1.5rem;">
@@ -2478,7 +2485,7 @@ function buildPendingCards(items){
 function doAdminAction(id, action){
   if(action==='reject' && !confirm('Reject this product? The farmer will be notified.')) return;
   const jwt = adminJWT();
-  fetch(`http://localhost:5000/api/admin/${action==='approve'?'approve':'reject'}/${id}`,{
+  fetch(`${BACKEND}/api/admin/${action==='approve'?'approve':'reject'}/${id}`,{
     method:'POST', headers:{'Authorization':'Bearer '+jwt}
   })
   .then(r=>r.json())
@@ -2499,7 +2506,7 @@ function doAnalyseAI(id){
   btn.disabled=true;
   btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Analysing…';
   const jwt = adminJWT();
-  fetch(`http://localhost:5000/api/admin/analyse/${id}`,{
+  fetch(`${BACKEND}/api/admin/analyse/${id}`,{
     method:'POST', headers:{'Authorization':'Bearer '+jwt}
   })
   .then(r=>r.json())
@@ -2534,7 +2541,7 @@ function adminAction(id, action){ doAdminAction(id, action); }
 function adminDeleteProduct(id){
   if(!confirm('Remove this product from the marketplace? Customers will no longer see it.')) return;
   const jwt = adminJWT();
-  fetch(`http://localhost:5000/api/admin/delete-product/${id}`,{
+  fetch(`${BACKEND}/api/admin/delete-product/${id}`,{
     method:'DELETE', headers:{'Authorization':'Bearer '+jwt}
   })
   .then(r=>r.json())
@@ -2551,7 +2558,7 @@ function adminDeleteProduct(id){
 function updatePendingCount(){
   const jwt = adminJWT();
   if(!jwt) return;
-  fetch('http://localhost:5000/api/admin/stats',{headers:{'Authorization':'Bearer '+jwt}})
+  fetch(`${BACKEND}/api/admin/stats`,{headers:{'Authorization':'Bearer '+jwt}})
   .then(r=>r.json())
   .then(data=>{
     const cnt = data.stats?.pending||0;
@@ -2887,7 +2894,7 @@ function placeOrderFinal(e){
   const btn = document.getElementById('placeOrderBtn');
   if(btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Placing order…'; }
 
-  fetch('http://localhost:5000/api/customer/orders',{
+  fetch(`${BACKEND}/api/customer/orders`,{
     method:'POST',
     headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+token },
     body: JSON.stringify(payload)
@@ -2929,7 +2936,7 @@ function openMyOrders(){
   const body  = document.getElementById('myOrdersBody');
   body.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--muted);"><i class="fas fa-spinner fa-spin"></i> Loading your orders…</div>';
 
-  fetch('http://localhost:5000/api/customer/orders',{
+  fetch(`${BACKEND}/api/customer/orders`,{
     headers: { Authorization: 'Bearer ' + token }
   })
   .then(r=>r.json())
@@ -2960,7 +2967,7 @@ function openMyOrders(){
         <div style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem;">
           ${(o.items||[]).map(i=>`
             <div style="display:flex;align-items:center;gap:.8rem;background:var(--warm);padding:.6rem .9rem;border-radius:var(--r-sm);">
-              ${i.image_url?`<img src="http://localhost:5000${i.image_url}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'"/>`:''}
+              ${i.image_url?`<img src="${BACKEND}${i.image_url}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'"/>`:''}
               <div style="flex:1;min-width:0;">
                 <div style="font-weight:600;font-size:.88rem;color:var(--brown-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i.product_name||i.grade+' Cashews'}</div>
                 <div style="font-size:.75rem;color:var(--muted);">${i.grade} · ${i.qty}kg @ ₹${i.price}/kg</div>
@@ -3034,7 +3041,7 @@ function submitContact(e){
   const btn = form.querySelector('button[type=submit]');
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
-  fetch('http://localhost:5000/api/enquiry', {
+  fetch(`${BACKEND}/api/enquiry`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: (name+' '+lname).trim()||'Anonymous', email, phone, message })
