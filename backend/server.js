@@ -55,7 +55,8 @@ app.get('*', (req, res) => {
 // ── Start ─────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  // console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📁 Serving frontend from: ../frontend`);
   console.log(`🤖 AI service expected at: ${process.env.AI_SERVICE_URL}`);
 });
