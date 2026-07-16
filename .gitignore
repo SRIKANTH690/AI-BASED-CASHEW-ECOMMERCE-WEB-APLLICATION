@@ -12,8 +12,7 @@ ai-service/__pycache__/
 ai-service/*.pyc
 ai-service/.pytest_cache/
 
-# AI Model files (too large for git)
-ai-service/model/*.pkl
+# AI Model files — keep pkl (small), ignore large training artifacts
 ai-service/model/*.h5
 ai-service/model/*.pt
 ai-service/model/training_plot.png
