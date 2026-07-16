@@ -36,6 +36,19 @@ const adminRoutes    = require('./routes/admin');
 const customerRoutes = require('./routes/customer');
 const { submitEnquiry } = require('./controllers/enquiryController');
 
+
+console.log("authRoutes:", typeof authRoutes);
+console.log("farmerRoutes:", typeof farmerRoutes);
+console.log("adminRoutes:", typeof adminRoutes);
+console.log("customerRoutes:", typeof customerRoutes);
+
+console.log(authRoutes);
+console.log(farmerRoutes);
+console.log(adminRoutes);
+console.log(customerRoutes);
+
+
+
 app.use('/api', authRoutes);
 app.use('/api/farmer',   farmerRoutes);
 app.use('/api/admin',    adminRoutes);
