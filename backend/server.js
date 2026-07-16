@@ -30,30 +30,56 @@ io.on('connection', (socket) => {
 app.set('io', io);
 
 // ── API Routes ────────────────────────────────────────────
-const authRoutes     = require('./routes/auth');
-const farmerRoutes   = require('./routes/farmer');
-const adminRoutes    = require('./routes/admin');
-const customerRoutes = require('./routes/customer');
+// const authRoutes     = require('./routes/auth');
+// const farmerRoutes   = require('./routes/farmer');
+// const adminRoutes    = require('./routes/admin');
+// const customerRoutes = require('./routes/customer');
+// const { submitEnquiry } = require('./controllers/enquiryController');
+
+// app.use('/api', authRoutes);
+// app.use('/api/farmer',   farmerRoutes);
+// app.use('/api/admin',    adminRoutes);
+// app.use('/api/customer', customerRoutes);
+
+
+
+// ── API Routes ────────────────────────────────────────────
+let authRoutes, farmerRoutes, adminRoutes, customerRoutes;
+
+try {
+  authRoutes = require('./routes/auth');
+  console.log("✅ authRoutes loaded");
+} catch (e) {
+  console.error("❌ authRoutes:", e);
+}
+
+try {
+  farmerRoutes = require('./routes/farmer');
+  console.log("✅ farmerRoutes loaded");
+} catch (e) {
+  console.error("❌ farmerRoutes:", e);
+}
+
+try {
+  adminRoutes = require('./routes/admin');
+  console.log("✅ adminRoutes loaded");
+} catch (e) {
+  console.error("❌ adminRoutes:", e);
+}
+
+try {
+  customerRoutes = require('./routes/customer');
+  console.log("✅ customerRoutes loaded");
+} catch (e) {
+  console.error("❌ customerRoutes:", e);
+}
+
 const { submitEnquiry } = require('./controllers/enquiryController');
 
-
-console.log("authRoutes:", typeof authRoutes);
-console.log("farmerRoutes:", typeof farmerRoutes);
-console.log("adminRoutes:", typeof adminRoutes);
-console.log("customerRoutes:", typeof customerRoutes);
-
-console.log(authRoutes);
-console.log(farmerRoutes);
-console.log(adminRoutes);
-console.log(customerRoutes);
-
-
-
-app.use('/api', authRoutes);
-app.use('/api/farmer',   farmerRoutes);
-app.use('/api/admin',    adminRoutes);
-app.use('/api/customer', customerRoutes);
-
+if (authRoutes) app.use('/api', authRoutes);
+if (farmerRoutes) app.use('/api/farmer', farmerRoutes);
+if (adminRoutes) app.use('/api/admin', adminRoutes);
+if (customerRoutes) app.use('/api/customer', customerRoutes);
 // Public enquiry submission (no auth needed)
 app.post('/api/enquiry', submitEnquiry);
 
@@ -68,8 +94,6 @@ app.get('*', (req, res) => {
 // ── Start ─────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  // console.log(`🚀 Server running at http://localhost:${PORT}`);
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📁 Serving frontend from: ../frontend`);
-  console.log(`🤖 AI service expected at: ${process.env.AI_SERVICE_URL}`);
+  console.log(`🤖 AI service: ${process.env.AI_SERVICE_URL}`);
 });
