@@ -1,4 +1,4 @@
-# Panruti Premium Cashews — AI-Based E-Commerce Web App
+gi# Panruti Premium Cashews — AI-Based E-Commerce Web App
 
 ## Project Structure
 ```
