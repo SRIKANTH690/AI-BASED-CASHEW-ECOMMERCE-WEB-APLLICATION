@@ -1231,7 +1231,7 @@ body.hide-buy .btn-buy,body.hide-buy .btn-contact,body.hide-buy #cartBubble,body
    BACKEND URL — auto-detects local vs production
    ========================================================= */
 const BACKEND = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? '${BACKEND}'
+  ? 'http://localhost:5000'
   : window.location.origin;
 
 /* =========================================================

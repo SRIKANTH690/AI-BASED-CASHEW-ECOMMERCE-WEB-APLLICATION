@@ -402,3 +402,10 @@ A: The browser's HTML5 Geolocation API captures the device's GPS coordinates whe
 
 **Q20: What makes this project different from normal e-commerce?**
 A: The AI quality inspection — no other cashew marketplace uses machine learning to automatically assess product quality from images. Farmers get AI-verified listings, customers get quality-assured products, and the admin gets an intelligent decision-support tool.
+
+
+
+
+
+
+

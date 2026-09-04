@@ -11,22 +11,21 @@ const app    = express();
 const server = http.createServer(app);
 const io     = new Server(server, { cors: { origin: '*', methods: ['GET','POST'] } });
 
-// ── Middleware ────────────────────────────────────────────
+
 app.use(cors({ origin: process.env.FRONTEND_URL || '*', credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ── Static files ──────────────────────────────────────────
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
-// ── Socket.io ─────────────────────────────────────────────
+
 io.on('connection', (socket) => {
   socket.on('join_admin', () => socket.join('admin_room'));
 });
 app.set('io', io);
 
-// ── Routes ────────────────────────────────────────────────
+
 const authRoutes     = require('./routes/auth');
 const farmerRoutes   = require('./routes/farmer');
 const adminRoutes    = require('./routes/admin');
@@ -39,15 +38,15 @@ app.use('/api/admin',    adminRoutes);
 app.use('/api/customer', customerRoutes);
 app.post('/api/enquiry', submitEnquiry);
 
-// ── Health check ──────────────────────────────────────────
+
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date() }));
 
-// ── Fallback: serve frontend ──────────────────────────────
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
-// ── Auto-create tables on first boot (handles Render fresh DB) ────────────
+
 async function initDB() {
   try {
     await pool.query(`
@@ -111,7 +110,7 @@ async function initDB() {
     `);
     console.log('✅ Database tables ready');
 
-    // Create default admin if not exists
+
     const existing = await pool.query("SELECT id FROM users WHERE email='admin@panruti.com'");
     if (!existing.rows.length) {
       const hash = await bcrypt.hash('admin123', 10);
@@ -125,6 +124,11 @@ async function initDB() {
     console.error('DB init error:', err.message);
   }
 }
+
+
+
+
+
 
 // ── Start ─────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
