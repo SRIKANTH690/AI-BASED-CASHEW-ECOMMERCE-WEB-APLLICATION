@@ -64,7 +64,7 @@ python train.py
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 # AI runs at http://localhost:8000
 ```
-
+ee
 ## Step 4 — Open the App
 Open browser: http://localhost:5000
 
